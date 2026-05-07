@@ -131,23 +131,22 @@ export default function LoginForm() {
           )}
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex items-center justify-between gap-3">
+          <label className="flex cursor-pointer items-center gap-2.5">
+            <input
+              type="checkbox"
+              className="size-4 shrink-0 rounded border-white/20 bg-white/5 text-primary focus:ring-2 focus:ring-primary/40"
+              {...register("remember")}
+            />
+            <span className="text-sm text-white">Remember Me</span>
+          </label>
           <a
             href="#forgot-password"
-            className="text-sm font-medium text-primary hover:underline"
+            className="shrink-0 text-sm font-medium text-primary hover:underline"
           >
             Forgot Password?
           </a>
         </div>
-
-        <label className="flex cursor-pointer items-center gap-2.5">
-          <input
-            type="checkbox"
-            className="size-4 rounded border-white/20 bg-white/5 text-primary focus:ring-2 focus:ring-primary/40"
-            {...register("remember")}
-          />
-          <span className="text-sm text-white">Remember Me</span>
-        </label>
       </div>
 
       <button
