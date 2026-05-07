@@ -1,5 +1,16 @@
 @import 'tailwindcss';
 
+@theme {
+  --color-primary: #2563eb;
+  --color-accent: #00d4ff;
+  --color-dark: #0d1117;
+  --color-secondary: #9ca3af;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-sidebar: #111827;
+}
+
 :root {
   --text: #6b6375;
   --text-h: #08060d;
@@ -53,11 +64,7 @@
 }
 
 #root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
+  width: 100%;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
