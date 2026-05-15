@@ -3,6 +3,7 @@ import { isAxiosError } from "axios";
 import { ArrowRight, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import { login } from "@/services/auth.service";
@@ -17,6 +18,7 @@ export type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const {
     register,
@@ -35,6 +37,7 @@ export default function LoginForm() {
     try {
       await login({ email: data.email, password: data.password });
       toast.success("Signed in successfully");
+      navigate("/dashboard/users", { replace: true });
     } catch (error: unknown) {
       let message = "Sign in failed";
       if (isAxiosError(error)) {

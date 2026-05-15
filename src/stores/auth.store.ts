@@ -1,7 +1,15 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-export type LoginResponse = Record<string, unknown>;
+export type LoginResponse = {
+  success: boolean;
+  token?: string;
+  user?: {
+    email: string;
+    name: string;
+    userRole?: { name: string };
+  };
+};
 
 type AuthState = {
   loginResponse: LoginResponse | null;
