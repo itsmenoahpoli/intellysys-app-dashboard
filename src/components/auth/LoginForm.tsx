@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import { login } from "@/services/auth.service";
+import { useAuthStore } from "@/stores/auth.store";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Enter a valid email"),
@@ -19,6 +20,7 @@ export type LoginFormValues = z.infer<typeof loginSchema>;
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const setRememberMe = useAuthStore((s) => s.setRememberMe);
 
   const {
     register,
@@ -35,9 +37,10 @@ export default function LoginForm() {
 
   async function onSubmit(data: LoginFormValues) {
     try {
+      setRememberMe(data.remember);
       await login({ email: data.email, password: data.password });
       toast.success("Signed in successfully");
-      navigate("/dashboard/users", { replace: true });
+      navigate("/dashboard", { replace: true });
     } catch (error: unknown) {
       let message = "Sign in failed";
       if (isAxiosError(error)) {

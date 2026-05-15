@@ -22,5 +22,15 @@ http.interceptors.request.use((config) => {
 
 http.interceptors.response.use(
   (response) => response,
-  (error: AxiosError) => Promise.reject(error),
+  (error: AxiosError) => {
+    const status = error.response?.status
+    if (status === 401) {
+      // Token invalid/expired: clear auth and let the app route-guard redirect.
+      useAuthStore.getState().clearAuth()
+      if (typeof window !== 'undefined' && window.location.pathname !== '/signin') {
+        window.location.assign('/signin')
+      }
+    }
+    return Promise.reject(error)
+  },
 );

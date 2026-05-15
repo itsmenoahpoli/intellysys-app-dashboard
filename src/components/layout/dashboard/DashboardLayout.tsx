@@ -58,9 +58,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const userRole = formatRole(useAuthStore((s) => s.loginResponse?.user?.userRole?.name))
 
   return (
-    <div className="flex min-h-svh w-full bg-dark text-white">
+    <div className="flex min-h-svh w-full bg-[#070A10] text-white">
       <aside
-        className="hidden w-[240px] shrink-0 flex-col border-r border-white/15 bg-sidebar lg:flex"
+        className="hidden w-[240px] shrink-0 flex-col border-r border-white/20 bg-[#070A10] shadow-[6px_0_28px_rgba(0,0,0,0.55)] lg:flex"
         aria-label="Main navigation"
       >
         <div className="border-b border-white/15 px-4 py-5">
@@ -128,7 +128,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </div>
       </aside>
 
-      <div className="relative flex min-h-svh min-w-0 flex-1 flex-col">
+      <div className="relative flex min-h-svh min-w-0 flex-1 flex-col bg-dark">
         <div
           className="pointer-events-none absolute inset-0 opacity-80"
           aria-hidden

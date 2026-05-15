@@ -15,9 +15,14 @@ import { useAuthStore } from './stores/auth.store'
 
 export default function App() {
   const token = useAuthStore((s) => s.loginResponse?.token)
+  const hasHydrated = useAuthStore((s) => s.hasHydrated)
 
   if (env.maintenanceMode) {
     return <MaintenancePage />
+  }
+
+  if (!hasHydrated) {
+    return null
   }
 
   return (
@@ -25,7 +30,7 @@ export default function App() {
       <Route path="/" element={<Navigate to="/signin" replace />} />
       <Route
         path="/signin"
-        element={token ? <Navigate to="/dashboard/users" replace /> : <SignInPage />}
+        element={token ? <Navigate to="/dashboard" replace /> : <SignInPage />}
       />
       <Route
         path="/dashboard/users"
@@ -122,7 +127,9 @@ export default function App() {
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const token = useAuthStore((s) => s.loginResponse?.token)
+  const hasHydrated = useAuthStore((s) => s.hasHydrated)
   const location = useLocation()
+  if (!hasHydrated) return null
   if (!token) {
     return <Navigate to="/signin" replace state={{ from: location.pathname }} />
   }
