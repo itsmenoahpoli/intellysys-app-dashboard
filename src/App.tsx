@@ -8,8 +8,10 @@ import AlertsPage from './pages/AlertsPage'
 import HelpSupportPage from './pages/HelpSupportPage'
 import LogsReportsPage from './pages/LogsReportsPage'
 import MonitoringPage from './pages/MonitoringPage'
+import MyAccountPage from './pages/MyAccountPage'
 import SettingsPage from './pages/SettingsPage'
 import SubscriptionsPage from './pages/SubscriptionsPage'
+import UpdatePasswordPage from './pages/UpdatePasswordPage'
 import UsersPage from './pages/UsersPage'
 import DevicesPage from './pages/DevicesPage'
 import { useAuthStore } from './stores/auth.store'
@@ -54,6 +56,22 @@ export default function App() {
         element={
           <RequireAuth>
             <DevicesPage />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/dashboard/my-account"
+        element={
+          <RequireAuth>
+            <MyAccountPage />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/dashboard/update-password"
+        element={
+          <RequireAuth>
+            <UpdatePasswordPage />
           </RequireAuth>
         }
       />

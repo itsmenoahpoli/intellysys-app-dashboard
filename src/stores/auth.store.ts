@@ -23,6 +23,7 @@ type AuthState = {
   hasHydrated: boolean;
   setRememberMe: (remember: boolean) => void;
   setLoginResponse: (data: LoginResponse) => void;
+  updateAuthUser: (user: { name: string; email: string }) => void;
   clearAuth: () => void;
   setHasHydrated: (v: boolean) => void;
 };
@@ -75,6 +76,16 @@ export const useAuthStore = create<AuthState>()(
       hasHydrated: false,
       setRememberMe: (rememberMe) => set({ rememberMe }),
       setLoginResponse: (data) => set({ loginResponse: data }),
+      updateAuthUser: (user) =>
+        set((state) => {
+          if (!state.loginResponse?.user) return state;
+          return {
+            loginResponse: {
+              ...state.loginResponse,
+              user: { ...state.loginResponse.user, ...user },
+            },
+          };
+        }),
       clearAuth: () => set({ loginResponse: null }),
       setHasHydrated: (v) => set({ hasHydrated: v }),
     }),

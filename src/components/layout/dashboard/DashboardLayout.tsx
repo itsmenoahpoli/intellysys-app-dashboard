@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
-import { useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { useEffect, useId, useRef, useState } from 'react'
+import { NavLink, useNavigate } from 'react-router-dom'
 import {
   Activity,
   Bell,
@@ -9,15 +9,19 @@ import {
   CreditCard,
   FileText,
   Gauge,
+  KeyRound,
   Laptop,
+  LogOut,
   Menu,
   Settings,
   ShieldOff,
+  UserCircle,
   Users,
   Waypoints,
   X,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth.store'
+import { logout } from '@/services/auth.service'
 import brandLogo from '@/assets/brand-logo.png'
 
 type DashboardLayoutProps = {
@@ -54,6 +58,148 @@ function formatRole(raw?: string) {
   if (v === 'manager') return 'Operator'
   if (v === 'employee') return 'Viewer'
   return raw ? titleCase(raw) : 'Super Administrator'
+}
+
+function UserMenuCard({
+  userName,
+  userRole,
+  closeParent,
+}: {
+  userName: string
+  userRole: string
+  closeParent?: () => void
+}) {
+  const [open, setOpen] = useState(false)
+  const menuId = useId()
+  const rootRef = useRef<HTMLDivElement | null>(null)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!open) return
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+
+    const onPointerDown = (e: MouseEvent | TouchEvent) => {
+      const el = rootRef.current
+      if (!el) return
+      const target = e.target as Node | null
+      if (target && el.contains(target)) return
+      setOpen(false)
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    document.addEventListener('mousedown', onPointerDown)
+    document.addEventListener('touchstart', onPointerDown, { passive: true })
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      document.removeEventListener('mousedown', onPointerDown)
+      document.removeEventListener('touchstart', onPointerDown)
+    }
+  }, [open])
+
+  const go = (to: string) => {
+    setOpen(false)
+    closeParent?.()
+    navigate(to)
+  }
+
+  const doLogout = () => {
+    setOpen(false)
+    closeParent?.()
+    void (async () => {
+      await logout()
+      navigate('/signin', { replace: true })
+    })()
+  }
+
+  return (
+    <div ref={rootRef} className="relative">
+      <button
+        type="button"
+        className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-left transition-colors hover:bg-white/7 hover:backdrop-blur-sm"
+        aria-label="Open user menu"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-controls={menuId}
+        onClick={() => setOpen((v) => !v)}
+      >
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="relative">
+            <div className="grid size-10 place-items-center rounded-full bg-white/10 text-sm font-semibold text-white ring-1 ring-white/10">
+              {userName.slice(0, 1).toUpperCase()}
+            </div>
+            <span
+              className="absolute -bottom-0.5 -left-0.5 size-2.5 rounded-full bg-success ring-2 ring-sidebar"
+              aria-hidden
+            />
+          </div>
+
+          <div className="min-w-0">
+            <div className="truncate text-sm font-semibold text-white">{userName}</div>
+            <div className="truncate text-[11px] text-secondary">{userRole}</div>
+          </div>
+        </div>
+
+        <ChevronRight
+          className={[
+            'size-4 shrink-0 text-secondary transition-transform',
+            open ? '-rotate-90' : '',
+          ].join(' ')}
+          aria-hidden
+        />
+      </button>
+
+      {open ? (
+        <div
+          id={menuId}
+          role="menu"
+          className="absolute bottom-full left-0 right-0 z-50 mb-2 overflow-hidden rounded-xl border border-white/10 bg-[#0b0e14]/95 shadow-[0_18px_50px_rgba(0,0,0,0.65)] backdrop-blur"
+        >
+          <div
+            className="absolute -bottom-1.5 left-8 size-3 rotate-45 border border-white/10 bg-[#0b0e14]/95"
+            aria-hidden
+          />
+
+          <div className="p-1.5">
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => go('/dashboard/my-account')}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-white/90 transition-colors hover:bg-white/6 hover:text-white focus:outline-none"
+            >
+              <UserCircle className="size-4 text-secondary" aria-hidden />
+              My Account
+            </button>
+
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => go('/dashboard/update-password')}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-white/90 transition-colors hover:bg-white/6 hover:text-white focus:outline-none"
+            >
+              <KeyRound className="size-4 text-secondary" aria-hidden />
+              Update Password
+            </button>
+
+            <div className="my-1.5 border-t border-white/10" aria-hidden />
+
+            <button
+              type="button"
+              role="menuitem"
+              onClick={doLogout}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-danger transition-colors hover:bg-danger/10 focus:outline-none"
+            >
+              <LogOut className="size-4" aria-hidden />
+              Log Out
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  )
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
@@ -109,30 +255,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </nav>
 
         <div className="p-3">
-          <button
-            type="button"
-            className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-left transition-colors hover:bg-white/7 hover:backdrop-blur-sm"
-            aria-label="Open user menu"
-          >
-            <div className="flex min-w-0 items-center gap-3">
-              <div className="relative">
-                <div className="grid size-10 place-items-center rounded-full bg-white/10 text-sm font-semibold text-white ring-1 ring-white/10">
-                  {userName.slice(0, 1).toUpperCase()}
-                </div>
-                <span
-                  className="absolute -bottom-0.5 -left-0.5 size-2.5 rounded-full bg-success ring-2 ring-sidebar"
-                  aria-hidden
-                />
-              </div>
-
-              <div className="min-w-0">
-                <div className="truncate text-sm font-semibold text-white">{userName}</div>
-                <div className="truncate text-[11px] text-secondary">{userRole}</div>
-              </div>
-            </div>
-
-            <ChevronRight className="size-4 shrink-0 text-secondary" aria-hidden />
-          </button>
+          <UserMenuCard userName={userName} userRole={userRole} />
         </div>
       </aside>
 
@@ -199,30 +322,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </nav>
 
         <div className="p-3">
-          <button
-            type="button"
-            className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-left transition-colors hover:bg-white/7 hover:backdrop-blur-sm"
-            aria-label="Open user menu"
-          >
-            <div className="flex min-w-0 items-center gap-3">
-              <div className="relative">
-                <div className="grid size-10 place-items-center rounded-full bg-white/10 text-sm font-semibold text-white ring-1 ring-white/10">
-                  {userName.slice(0, 1).toUpperCase()}
-                </div>
-                <span
-                  className="absolute -bottom-0.5 -left-0.5 size-2.5 rounded-full bg-success ring-2 ring-sidebar"
-                  aria-hidden
-                />
-              </div>
-
-              <div className="min-w-0">
-                <div className="truncate text-sm font-semibold text-white">{userName}</div>
-                <div className="truncate text-[11px] text-secondary">{userRole}</div>
-              </div>
-            </div>
-
-            <ChevronRight className="size-4 shrink-0 text-secondary" aria-hidden />
-          </button>
+          <UserMenuCard userName={userName} userRole={userRole} closeParent={closeMobileMenu} />
         </div>
       </aside>
 

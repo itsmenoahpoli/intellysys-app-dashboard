@@ -12,6 +12,12 @@ export async function login(payload: LoginPayload) {
   return data;
 }
 
-export function logout() {
-  useAuthStore.getState().clearAuth();
+export async function logout() {
+  try {
+    await http.post("/auth/logout");
+  } catch {
+    // best-effort: still clear local auth if the request fails
+  } finally {
+    useAuthStore.getState().clearAuth();
+  }
 }

@@ -37,6 +37,8 @@ export default function UsersPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState<10 | 25 | 50 | 100>(10);
   const [q, setQ] = useState("");
+  const [sortBy, setSortBy] = useState<"name" | "email" | "createdAt" | "updatedAt">("name");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [roleId, setRoleId] = useState<"all" | number>("all");
   const [status, setStatus] = useState<"all" | "active" | "inactive">("all");
   const [department, setDepartment] = useState<string>("all");
@@ -56,7 +58,7 @@ export default function UsersPage() {
   });
 
   const usersQuery = useQuery({
-    queryKey: ["users", { page, limit, q, roleId, status, department }],
+    queryKey: ["users", { page, limit, q, roleId, status, department, sortBy, sortOrder }],
     queryFn: () =>
       fetchUsers({
         page,
@@ -65,6 +67,8 @@ export default function UsersPage() {
         roleId,
         status,
         department,
+        sortBy,
+        sortOrder,
       }),
   });
 
@@ -227,6 +231,13 @@ export default function UsersPage() {
           onChangeQ={(v) => {
             setPage(1);
             setQ(v);
+          }}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          onSortChange={(nextSortBy, nextSortOrder) => {
+            setPage(1);
+            setSortBy(nextSortBy as typeof sortBy);
+            setSortOrder(nextSortOrder);
           }}
           roleId={roleId}
           onChangeRoleId={(v) => {
