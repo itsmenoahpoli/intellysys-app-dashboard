@@ -1,5 +1,6 @@
 export { default as Card } from './Card'
 export { default as ConfirmDialog } from './ConfirmDialog'
+export { default as AuthSessionLogsModal } from './AuthSessionLogsModal'
 export { default as DonutChart } from './DonutChart'
 export { default as Field } from './Field'
 export { default as PageButton } from './PageButton'

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import {
   Activity,
@@ -9,10 +10,12 @@ import {
   FileText,
   Gauge,
   Laptop,
+  Menu,
   Settings,
   ShieldOff,
   Users,
   Waypoints,
+  X,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth.store'
 import brandLogo from '@/assets/brand-logo.png'
@@ -54,13 +57,18 @@ function formatRole(raw?: string) {
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const userName = useAuthStore((s) => s.loginResponse?.user?.name) ?? 'Admin'
   const userRole = formatRole(useAuthStore((s) => s.loginResponse?.user?.userRole?.name))
 
+  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen)
+  const closeMobileMenu = () => setMobileMenuOpen(false)
+
   return (
     <div className="flex min-h-svh w-full bg-[#070A10] text-white">
+      {/* Desktop Sidebar - Fixed */}
       <aside
-        className="hidden w-[240px] shrink-0 flex-col border-r border-white/20 bg-[#070A10] shadow-[6px_0_28px_rgba(0,0,0,0.55)] lg:flex"
+        className="fixed left-0 top-0 z-40 hidden h-screen w-[240px] shrink-0 flex-col border-r border-white/20 bg-[#070A10] shadow-[6px_0_28px_rgba(0,0,0,0.55)] md:flex"
         aria-label="Main navigation"
       >
         <div className="border-b border-white/15 px-4 py-5">
@@ -128,7 +136,118 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </div>
       </aside>
 
-      <div className="relative flex min-h-svh min-w-0 flex-1 flex-col bg-dark">
+      {/* Mobile Sidebar Overlay */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+          onClick={closeMobileMenu}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Mobile Sidebar - Slide-out */}
+      <aside
+        className={`fixed left-0 top-0 z-50 h-screen w-[240px] shrink-0 flex-col border-r border-white/20 bg-[#070A10] shadow-[6px_0_28px_rgba(0,0,0,0.55)] transition-transform duration-300 ease-in-out md:hidden ${
+          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+        aria-label="Mobile navigation"
+      >
+        <div className="flex items-center justify-between border-b border-white/15 px-4 py-4">
+          <div className="flex items-center justify-start">
+            <img
+              src={brandLogo}
+              alt="WAP INTELLYSIS"
+              className="h-10 w-auto max-w-[180px] select-none object-contain"
+              draggable={false}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={closeMobileMenu}
+            className="grid size-8 place-items-center rounded-lg text-secondary hover:bg-white/5 hover:text-white"
+            aria-label="Close menu"
+          >
+            <X className="size-5" aria-hidden />
+          </button>
+        </div>
+
+        <nav className="flex-1 overflow-auto p-3" aria-label="Sidebar navigation">
+          <ul className="space-y-1">
+            {NAV_ITEMS.map((item) => (
+              <li key={item.to}>
+                <NavLink
+                  to={item.to}
+                  onClick={closeMobileMenu}
+                  className={({ isActive }) =>
+                    [
+                      'group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                      isActive
+                        ? 'bg-white/8 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.08)]'
+                        : 'text-secondary hover:bg-white/5 hover:text-white',
+                    ].join(' ')
+                  }
+                >
+                  <item.icon
+                    className="size-[18px] shrink-0 text-secondary group-hover:text-white"
+                    aria-hidden
+                  />
+                  <span className="min-w-0 truncate">{item.label}</span>
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div className="p-3">
+          <button
+            type="button"
+            className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-left transition-colors hover:bg-white/7 hover:backdrop-blur-sm"
+            aria-label="Open user menu"
+          >
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="relative">
+                <div className="grid size-10 place-items-center rounded-full bg-white/10 text-sm font-semibold text-white ring-1 ring-white/10">
+                  {userName.slice(0, 1).toUpperCase()}
+                </div>
+                <span
+                  className="absolute -bottom-0.5 -left-0.5 size-2.5 rounded-full bg-success ring-2 ring-sidebar"
+                  aria-hidden
+                />
+              </div>
+
+              <div className="min-w-0">
+                <div className="truncate text-sm font-semibold text-white">{userName}</div>
+                <div className="truncate text-[11px] text-secondary">{userRole}</div>
+              </div>
+            </div>
+
+            <ChevronRight className="size-4 shrink-0 text-secondary" aria-hidden />
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <div className="relative flex min-h-svh min-w-0 flex-1 flex-col bg-dark md:pl-[240px]">
+        {/* Mobile Header with Toggle */}
+        <div className="flex items-center justify-between border-b border-white/10 bg-[#070A10]/80 px-4 py-3 backdrop-blur-sm md:hidden">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={toggleMobileMenu}
+              className="grid size-10 place-items-center rounded-lg border border-white/10 bg-white/5 text-secondary hover:bg-white/10 hover:text-white"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X className="size-5" aria-hidden /> : <Menu className="size-5" aria-hidden />}
+            </button>
+            <img
+              src={brandLogo}
+              alt="WAP INTELLYSIS"
+              className="h-8 w-auto max-w-[150px] select-none object-contain"
+              draggable={false}
+            />
+          </div>
+        </div>
+
         <div
           className="pointer-events-none absolute inset-0 opacity-80"
           aria-hidden

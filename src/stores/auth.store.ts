@@ -4,6 +4,8 @@ import {
   persist,
   type StateStorage,
 } from "zustand/middleware";
+import { env } from "@/config/env.config";
+import { decryptString, encryptString } from "@/utils/crypto";
 
 export type LoginResponse = {
   success: boolean;
@@ -26,6 +28,7 @@ type AuthState = {
 };
 
 const STORAGE_KEY = "intellysys-auth";
+const PERSIST_SECRET = env.authPersistSecret;
 
 type PersistedAuthState = Pick<AuthState, "loginResponse" | "rememberMe">;
 
@@ -35,9 +38,13 @@ type PersistedAuthState = Pick<AuthState, "loginResponse" | "rememberMe">;
  * - Otherwise, persist auth to sessionStorage (survives refresh, cleared on tab close).
  */
 const authStorage: StateStorage = {
-  getItem: (name: string) =>
-    sessionStorage.getItem(name) ?? localStorage.getItem(name),
-  setItem: (name: string, value: string) => {
+  getItem: async (name: string) => {
+    const raw = sessionStorage.getItem(name) ?? localStorage.getItem(name);
+    if (!raw) return null;
+    const dec = await decryptString(raw, PERSIST_SECRET);
+    return dec ?? raw;
+  },
+  setItem: async (name: string, value: string) => {
     let remember = false;
     try {
       const parsed = JSON.parse(value) as {
@@ -50,7 +57,8 @@ const authStorage: StateStorage = {
 
     const target = remember ? localStorage : sessionStorage;
     const other = remember ? sessionStorage : localStorage;
-    target.setItem(name, value);
+    const toStore = await encryptString(value, PERSIST_SECRET);
+    target.setItem(name, toStore);
     other.removeItem(name);
   },
   removeItem: (name: string) => {

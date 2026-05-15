@@ -11,6 +11,7 @@ import MonitoringPage from './pages/MonitoringPage'
 import SettingsPage from './pages/SettingsPage'
 import SubscriptionsPage from './pages/SubscriptionsPage'
 import UsersPage from './pages/UsersPage'
+import DevicesPage from './pages/DevicesPage'
 import { useAuthStore } from './stores/auth.store'
 
 export default function App() {
@@ -52,7 +53,7 @@ export default function App() {
         path="/dashboard/devices"
         element={
           <RequireAuth>
-            <DashboardPlaceholderPage title="Devices" />
+            <DevicesPage />
           </RequireAuth>
         }
       />

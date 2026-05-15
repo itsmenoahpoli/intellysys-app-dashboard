@@ -1,5 +1,6 @@
 import DashboardLayout from "@/components/layout/dashboard/DashboardLayout";
 import {
+  AuthSessionLogsModal,
   ConfirmDialog,
   RecentActivityCard,
   RoleDistributionCard,
@@ -40,6 +41,7 @@ export default function UsersPage() {
   const [status, setStatus] = useState<"all" | "active" | "inactive">("all");
   const [department, setDepartment] = useState<string>("all");
   const [userModalOpen, setUserModalOpen] = useState(false);
+  const [sessionLogsOpen, setSessionLogsOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserListItem | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<UserListItem | null>(null);
 
@@ -210,7 +212,7 @@ export default function UsersPage() {
   return (
     <DashboardLayout>
       <div className="w-full">
-        <UsersHeader onAdd={openCreate} />
+        <UsersHeader onAdd={openCreate} onOpenSessionLogs={() => setSessionLogsOpen(true)} />
 
         <UsersSummaryGrid
           totalUsers={cards?.totalUsers ?? 0}
@@ -284,6 +286,8 @@ export default function UsersPage() {
           updateMutation.mutate({ id: editingUser.id, payload });
         }}
       />
+
+      <AuthSessionLogsModal open={sessionLogsOpen} onClose={() => setSessionLogsOpen(false)} />
 
       <ConfirmDialog
         open={!!deleteTarget}
