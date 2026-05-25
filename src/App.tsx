@@ -14,6 +14,7 @@ import SubscriptionsPage from './pages/SubscriptionsPage'
 import UpdatePasswordPage from './pages/UpdatePasswordPage'
 import UsersPage from './pages/UsersPage'
 import DevicesPage from './pages/DevicesPage'
+import LicenseKeysPage from './pages/LicenseKeysPage'
 import { useAuthStore } from './stores/auth.store'
 
 export default function App() {
@@ -40,6 +41,14 @@ export default function App() {
         element={
           <RequireAuth>
             <UsersPage />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/dashboard/license-keys"
+        element={
+          <RequireAuth>
+            <LicenseKeysPage />
           </RequireAuth>
         }
       />

@@ -37,6 +37,7 @@ const NAV_ITEMS = [
   { label: 'Alerts', to: '/dashboard/alerts', icon: Bell },
   { label: 'Logs & Reports', to: '/dashboard/logs-reports', icon: FileText },
   { label: 'Users', to: '/dashboard/users', icon: Users },
+  { label: 'License Keys', to: '/dashboard/license-keys', icon: KeyRound },
   { label: 'Settings', to: '/dashboard/settings', icon: Settings },
   { label: 'Subscriptions', to: '/dashboard/subscriptions', icon: CreditCard },
   { label: 'Help & Support', to: '/dashboard/help-support', icon: CircleHelp },
