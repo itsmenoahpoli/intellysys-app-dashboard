@@ -1,21 +1,23 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
-  --color-primary: #2563eb;
-  --color-accent: #00d4ff;
-  --color-dark: #0b0e14;
-  --color-surface: #12161d;
-  --color-secondary: #9ca3af;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-danger: #ef4444;
-  --color-sidebar: #0b0e14;
+  --color-primary: var(--color-primary);
+  --color-accent: var(--color-accent);
+  --color-dark: var(--color-dark);
+  --color-surface: var(--color-surface);
+  --color-secondary: var(--color-secondary);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-danger: var(--color-danger);
+  --color-sidebar: var(--color-sidebar);
 }
 
 :root {
   --text: #6b6375;
   --text-h: #08060d;
-  --bg: #fff;
+  --bg: #ffffff;
   --border: #e5e4e7;
   --code-bg: #f4f3ec;
   --accent: #aa3bff;
@@ -23,7 +25,20 @@
   --accent-border: rgba(170, 59, 255, 0.5);
   --social-bg: rgba(244, 243, 236, 0.5);
   --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+    rgba(0, 0, 0, 0.05) 0 10px 15px -3px, rgba(0, 0, 0, 0.03) 0 4px 6px -2px;
+
+  /* Theme variables mapping for Light Mode */
+  --color-primary: #2563eb;
+  --color-accent: #00d4ff;
+  --color-dark: #f8fafc;
+  --color-surface: #ffffff;
+  --color-secondary: #64748b;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-sidebar: #ffffff;
+  --border-color: rgba(0, 0, 0, 0.08);
+  --text-color: #0f172a;
 
   --sans: system-ui, "Segoe UI", Roboto, sans-serif;
   --heading: system-ui, "Segoe UI", Roboto, sans-serif;
@@ -44,24 +59,35 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
+:root.dark {
+  --text: #9ca3af;
+  --text-h: #f3f4f6;
+  --bg: #070A10;
+  --border: #2e303a;
+  --code-bg: #1f2028;
+  --accent: #c084fc;
+  --accent-bg: rgba(192, 132, 252, 0.15);
+  --accent-border: rgba(192, 132, 252, 0.5);
+  --social-bg: rgba(47, 48, 58, 0.5);
+  --shadow:
+    rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+  /* Theme variables mapping for Dark Mode */
+  --color-primary: #3b82f6;
+  --color-accent: #00d4ff;
+  --color-dark: #0b0e14;
+  --color-surface: #12161d;
+  --color-secondary: #9ca3af;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-sidebar: #0b0e14;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --text-color: #ffffff;
+}
+
+:root.dark #social .button-icon {
+  filter: invert(1) brightness(2);
 }
 
 #root {
@@ -122,4 +148,80 @@ code {
 
 button {
   cursor: pointer !important;
+}
+
+/* Light mode specific element adjustments */
+:root:not(.dark) {
+  /* Override text color for titles, cards, lists, tabs, and form values */
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--text-color) !important;
+  }
+
+  /* Target headers, page titles, card stat values, username text, and strong text */
+  .text-white:not(button):not(a):not(.bg-primary):not(.bg-success):not(.bg-danger):not(.bg-warning),
+  .text-white\/90:not(button):not(a),
+  span.text-white:not(button):not(a),
+  div.text-white:not(button):not(a),
+  .text-slate-100 {
+    color: var(--text-color) !important;
+  }
+
+  /* Force pristine white text for buttons with colored backgrounds and their child items */
+  button.bg-primary,
+  button.bg-primary *,
+  button.bg-danger,
+  button.bg-danger *,
+  button.bg-success,
+  button.bg-success *,
+  .bg-primary,
+  .bg-primary *,
+  .bg-danger,
+  .bg-danger *,
+  .bg-success,
+  .bg-success * {
+    color: #ffffff !important;
+  }
+
+  /* Adjust border colors to feel modern and high contrast in light mode */
+  .border-white\/10,
+  .border-white\/15,
+  .border-white\/20,
+  .border-white\/5 {
+    border-color: rgba(15, 23, 42, 0.08) !important;
+  }
+
+  /* Adjust transparent backgrounds */
+  .bg-white\/5,
+  .bg-white\/8,
+  .bg-dark\/40 {
+    background-color: rgba(15, 23, 42, 0.04) !important;
+  }
+
+  .hover\:bg-white\/5:hover,
+  .hover\:bg-white\/7:hover,
+  .hover\:bg-white\/10:hover {
+    background-color: rgba(15, 23, 42, 0.06) !important;
+  }
+
+  /* Adjust shadow and glassmorphism cards */
+  .bg-surface\/70,
+  .bg-surface\/80,
+  .bg-surface {
+    background-color: #ffffff !important;
+    border-color: rgba(15, 23, 42, 0.06) !important;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05) !important;
+  }
+
+  /* Handle Tab buttons */
+  button.text-white {
+    color: var(--text-color) !important;
+  }
+  .text-secondary.hover\:text-white:hover {
+    color: var(--text-color) !important;
+  }
+  
+  /* Target light-blue/light-green text classes commonly used on dark backgrounds and make them darker blue/green for light mode */
+  .text-\[\#93c5fd\], .text-\[\#c4b5fd\], .text-\[\#fcd34d\], .text-\[\#67e8f9\], .text-\[\#6ee7b7\] {
+    color: var(--color-primary) !important;
+  }
 }

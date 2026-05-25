@@ -6,6 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>WAP INTELLYSIS · Admin Dashboard</title>
+    <script>
+      (function() {
+        try {
+          const themeState = JSON.parse(localStorage.getItem('intellysys-theme') || '{}');
+          const theme = themeState.state ? themeState.state.theme : 'dark';
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+            document.documentElement.style.colorScheme = 'dark';
+          } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.style.colorScheme = 'light';
+          }
+        } catch (e) {}
+      })();
+    </script>
     <meta
       name="description"
       content="WAP INTELLYSIS is a modern admin dashboard for managing devices, monitoring, alerts, logs, and users."

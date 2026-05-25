@@ -23,6 +23,8 @@ import {
 import { useAuthStore } from '@/stores/auth.store'
 import { logout } from '@/services/auth.service'
 import brandLogo from '@/assets/brand-logo.png'
+import { useThemeStore } from '@/stores/theme.store'
+import ThemeToggle from './ThemeToggle'
 
 type DashboardLayoutProps = {
   children: ReactNode
@@ -120,7 +122,7 @@ function UserMenuCard({
     <div ref={rootRef} className="relative">
       <button
         type="button"
-        className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-left transition-colors hover:bg-white/7 hover:backdrop-blur-sm"
+        className="flex w-full items-center justify-between rounded-xl border border-black/5 dark:border-white/10 bg-black/5 dark:bg-white/5 px-3 py-2.5 text-left transition-all hover:bg-black/7 dark:hover:bg-white/7 hover:backdrop-blur-sm"
         aria-label="Open user menu"
         aria-haspopup="menu"
         aria-expanded={open}
@@ -129,7 +131,7 @@ function UserMenuCard({
       >
         <div className="flex min-w-0 items-center gap-3">
           <div className="relative">
-            <div className="grid size-10 place-items-center rounded-full bg-white/10 text-sm font-semibold text-white ring-1 ring-white/10">
+            <div className="grid size-10 place-items-center rounded-full bg-black/10 dark:bg-white/10 text-sm font-semibold text-[var(--text-color)] dark:text-white ring-1 ring-black/5 dark:ring-white/10">
               {userName.slice(0, 1).toUpperCase()}
             </div>
             <span
@@ -139,7 +141,7 @@ function UserMenuCard({
           </div>
 
           <div className="min-w-0">
-            <div className="truncate text-sm font-semibold text-white">{userName}</div>
+            <div className="truncate text-sm font-semibold text-[var(--text-color)] dark:text-white">{userName}</div>
             <div className="truncate text-[11px] text-secondary">{userRole}</div>
           </div>
         </div>
@@ -157,10 +159,10 @@ function UserMenuCard({
         <div
           id={menuId}
           role="menu"
-          className="absolute bottom-full left-0 right-0 z-50 mb-2 overflow-hidden rounded-xl border border-white/10 bg-[#0b0e14]/95 shadow-[0_18px_50px_rgba(0,0,0,0.65)] backdrop-blur"
+          className="absolute bottom-full left-0 right-0 z-50 mb-2 overflow-hidden rounded-xl border border-black/5 dark:border-white/10 bg-surface/95 shadow-lg dark:shadow-[0_18px_50px_rgba(0,0,0,0.65)] backdrop-blur"
         >
           <div
-            className="absolute -bottom-1.5 left-8 size-3 rotate-45 border border-white/10 bg-[#0b0e14]/95"
+            className="absolute -bottom-1.5 left-8 size-3 rotate-45 border-b border-r border-black/5 dark:border-white/10 bg-surface/95"
             aria-hidden
           />
 
@@ -169,7 +171,7 @@ function UserMenuCard({
               type="button"
               role="menuitem"
               onClick={() => go('/dashboard/my-account')}
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-white/90 transition-colors hover:bg-white/6 hover:text-white focus:outline-none"
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[var(--text-color)]/90 transition-colors hover:bg-black/5 dark:hover:bg-white/6 hover:text-[var(--text-color)] focus:outline-none"
             >
               <UserCircle className="size-4 text-secondary" aria-hidden />
               My Account
@@ -179,13 +181,13 @@ function UserMenuCard({
               type="button"
               role="menuitem"
               onClick={() => go('/dashboard/update-password')}
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-white/90 transition-colors hover:bg-white/6 hover:text-white focus:outline-none"
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[var(--text-color)]/90 transition-colors hover:bg-black/5 dark:hover:bg-white/6 hover:text-[var(--text-color)] focus:outline-none"
             >
               <KeyRound className="size-4 text-secondary" aria-hidden />
               Update Password
             </button>
 
-            <div className="my-1.5 border-t border-white/10" aria-hidden />
+            <div className="my-1.5 border-t border-black/5 dark:border-white/10" aria-hidden />
 
             <button
               type="button"
@@ -207,18 +209,30 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const userName = useAuthStore((s) => s.loginResponse?.user?.name) ?? 'Admin'
   const userRole = formatRole(useAuthStore((s) => s.loginResponse?.user?.userRole?.name))
+  const theme = useThemeStore((s) => s.theme)
+
+  useEffect(() => {
+    const root = window.document.documentElement
+    if (theme === 'dark') {
+      root.classList.add('dark')
+      root.style.colorScheme = 'dark'
+    } else {
+      root.classList.remove('dark')
+      root.style.colorScheme = 'light'
+    }
+  }, [theme])
 
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen)
   const closeMobileMenu = () => setMobileMenuOpen(false)
 
   return (
-    <div className="flex min-h-svh w-full bg-[#070A10] text-white">
+    <div className="flex min-h-svh w-full bg-dark text-[var(--text-color)] transition-colors duration-300">
       {/* Desktop Sidebar - Fixed */}
       <aside
-        className="fixed left-0 top-0 z-40 hidden h-screen w-[240px] shrink-0 flex-col border-r border-white/20 bg-[#070A10] shadow-[6px_0_28px_rgba(0,0,0,0.55)] md:flex"
+        className="fixed left-0 top-0 z-40 hidden h-screen w-[240px] shrink-0 flex-col border-r border-black/5 dark:border-white/20 bg-sidebar shadow-md dark:shadow-[6px_0_28px_rgba(0,0,0,0.55)] md:flex transition-all duration-300"
         aria-label="Main navigation"
       >
-        <div className="border-b border-white/15 px-4 py-5">
+        <div className="border-b border-black/5 dark:border-white/15 px-4 py-5">
           <div className="flex items-center justify-start">
             <img
               src={brandLogo}
@@ -239,13 +253,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     [
                       'group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                       isActive
-                        ? 'bg-white/8 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.08)]'
-                        : 'text-secondary hover:bg-white/5 hover:text-white',
+                        ? 'bg-primary/10 text-primary dark:bg-white/8 dark:text-white shadow-[0_0_0_1px_rgba(37,99,235,0.08)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.08)] active-nav-item'
+                        : 'text-secondary hover:bg-black/5 hover:text-primary dark:hover:bg-white/5 dark:hover:text-white',
                     ].join(' ')
                   }
                 >
                   <item.icon
-                    className="size-[18px] shrink-0 text-secondary group-hover:text-white"
+                    className="size-[18px] shrink-0 text-secondary group-hover:text-primary dark:group-hover:text-white group-[.active-nav-item]:text-primary dark:group-[.active-nav-item]:text-white"
                     aria-hidden
                   />
                   <span className="min-w-0 truncate">{item.label}</span>
@@ -255,7 +269,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </ul>
         </nav>
 
-        <div className="p-3">
+        <div className="flex flex-col gap-3 p-3 border-t border-black/5 dark:border-white/10">
+          <ThemeToggle />
           <UserMenuCard userName={userName} userRole={userRole} />
         </div>
       </aside>
@@ -271,12 +286,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Mobile Sidebar - Slide-out */}
       <aside
-        className={`fixed left-0 top-0 z-50 h-screen w-[240px] shrink-0 flex-col border-r border-white/20 bg-[#070A10] shadow-[6px_0_28px_rgba(0,0,0,0.55)] transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed left-0 top-0 z-50 h-screen w-[240px] shrink-0 flex-col border-r border-black/5 dark:border-white/20 bg-sidebar shadow-md dark:shadow-[6px_0_28px_rgba(0,0,0,0.55)] transition-all duration-300 ease-in-out md:hidden ${
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         aria-label="Mobile navigation"
       >
-        <div className="flex items-center justify-between border-b border-white/15 px-4 py-4">
+        <div className="flex items-center justify-between border-b border-black/5 dark:border-white/15 px-4 py-4">
           <div className="flex items-center justify-start">
             <img
               src={brandLogo}
@@ -288,7 +303,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <button
             type="button"
             onClick={closeMobileMenu}
-            className="grid size-8 place-items-center rounded-lg text-secondary hover:bg-white/5 hover:text-white"
+            className="grid size-8 place-items-center rounded-lg text-secondary hover:bg-black/5 dark:hover:bg-white/5 hover:text-primary dark:hover:text-white"
             aria-label="Close menu"
           >
             <X className="size-5" aria-hidden />
@@ -306,13 +321,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     [
                       'group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                       isActive
-                        ? 'bg-white/8 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.08)]'
-                        : 'text-secondary hover:bg-white/5 hover:text-white',
+                        ? 'bg-primary/10 text-primary dark:bg-white/8 dark:text-white shadow-[0_0_0_1px_rgba(37,99,235,0.08)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.08)] active-nav-item'
+                        : 'text-secondary hover:bg-black/5 hover:text-primary dark:hover:bg-white/5 dark:hover:text-white',
                     ].join(' ')
                   }
                 >
                   <item.icon
-                    className="size-[18px] shrink-0 text-secondary group-hover:text-white"
+                    className="size-[18px] shrink-0 text-secondary group-hover:text-primary dark:group-hover:text-white group-[.active-nav-item]:text-primary dark:group-[.active-nav-item]:text-white"
                     aria-hidden
                   />
                   <span className="min-w-0 truncate">{item.label}</span>
@@ -322,7 +337,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </ul>
         </nav>
 
-        <div className="p-3">
+        <div className="flex flex-col gap-3 p-3 border-t border-black/5 dark:border-white/10">
+          <ThemeToggle />
           <UserMenuCard userName={userName} userRole={userRole} closeParent={closeMobileMenu} />
         </div>
       </aside>
@@ -330,12 +346,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Main Content Area */}
       <div className="relative flex min-h-svh min-w-0 flex-1 flex-col bg-dark md:pl-[240px]">
         {/* Mobile Header with Toggle */}
-        <div className="flex items-center justify-between border-b border-white/10 bg-[#070A10]/80 px-4 py-3 backdrop-blur-sm md:hidden">
+        <div className="flex items-center justify-between border-b border-black/5 dark:border-white/10 bg-sidebar/80 px-4 py-3 backdrop-blur-sm md:hidden">
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={toggleMobileMenu}
-              className="grid size-10 place-items-center rounded-lg border border-white/10 bg-white/5 text-secondary hover:bg-white/10 hover:text-white"
+              className="grid size-10 place-items-center rounded-lg border border-black/5 dark:border-white/10 bg-black/5 dark:bg-white/5 text-secondary hover:bg-black/10 dark:hover:bg-white/10 hover:text-[var(--text-color)]"
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? <X className="size-5" aria-hidden /> : <Menu className="size-5" aria-hidden />}

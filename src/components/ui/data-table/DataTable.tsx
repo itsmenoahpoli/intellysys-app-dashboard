@@ -56,7 +56,7 @@ export default function DataTable<T>({
   return (
     <div
       className={[
-        'flex flex-col gap-3 rounded-xl border border-white/10 bg-surface/80 p-3 shadow-[0_12px_30px_rgba(0,0,0,0.25)]',
+        'flex flex-col gap-3 rounded-xl border border-black/5 dark:border-white/10 bg-surface/80 p-3 shadow-[0_12px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_12px_30px_rgba(0,0,0,0.25)]',
         className,
       ].join(' ')}
     >
@@ -73,7 +73,7 @@ export default function DataTable<T>({
                 value={search.value}
                 onChange={(e) => search.onChange(e.target.value)}
                 placeholder={search.placeholder ?? 'Search…'}
-                className="w-full rounded-lg border border-white/10 bg-dark/40 py-2 pl-9 pr-3 text-sm text-white placeholder:text-secondary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="w-full rounded-lg border border-black/5 dark:border-white/10 bg-black/5 dark:bg-dark/40 py-2 pl-9 pr-3 text-sm text-slate-900 dark:text-white placeholder:text-secondary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
               />
             </div>
           ) : null}
@@ -107,13 +107,13 @@ export default function DataTable<T>({
                           type="button"
                           onClick={() => handleSort(column)}
                           className={[
-                            'inline-flex items-center gap-1 transition-colors hover:text-white',
+                            'inline-flex items-center gap-1 transition-colors hover:text-slate-900 dark:hover:text-white',
                             column.align === 'right'
                               ? 'ml-auto'
                               : column.align === 'center'
                                 ? 'mx-auto'
                                 : '',
-                            isSorted ? 'text-white' : '',
+                            isSorted ? 'text-slate-900 dark:text-white' : '',
                           ].join(' ')}
                         >
                           {column.header}
@@ -138,7 +138,7 @@ export default function DataTable<T>({
                 data.map((row) => (
                   <tr
                     key={rowKey(row)}
-                    className="border-t border-white/5 hover:bg-white/[0.04] hover:backdrop-blur-sm"
+                    className="border-t border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.04] hover:backdrop-blur-sm"
                   >
                     {columns.map((column) => (
                       <td
