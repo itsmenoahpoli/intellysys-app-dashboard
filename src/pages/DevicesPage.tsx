@@ -1,4 +1,6 @@
 import DashboardLayout from '@/components/layout/dashboard/DashboardLayout'
+import { fetchAgents } from '@/services/agents.service'
+import { useQuery } from '@tanstack/react-query'
 import {
   ChevronDown,
   HardDrive,
@@ -142,108 +144,50 @@ export default function DevicesPage() {
   const [rowsPerPage, setRowsPerPage] = useState<10 | 25 | 50>(10)
   const [menuId, setMenuId] = useState<string | null>(null)
 
-  const allRows: DeviceRow[] = useMemo(
-    () => [
-      {
-        id: 'router-01',
-        name: 'Router-01',
-        subtitle: 'Core Router',
-        ip: '192.168.1.1',
-        type: 'Router',
-        os: 'MikroTik RouterOS 7.13',
-        status: 'Online',
-        lastSeen: '2 mins ago',
-        group: 'Network Core',
-      },
-      {
-        id: 'switch-01',
-        name: 'Switch-01',
-        subtitle: 'Main Switch',
-        ip: '192.168.1.2',
-        type: 'Switch',
-        os: 'Cisco IOS 15.2',
-        status: 'Online',
-        lastSeen: '1 min ago',
-        group: 'Network Core',
-      },
-      {
-        id: 'firewall-01',
-        name: 'Firewall-01',
-        subtitle: 'Security Firewall',
-        ip: '192.168.1.3',
-        type: 'Firewall',
-        os: 'FortiOS 7.2.4',
-        status: 'Offline',
-        lastSeen: '15 mins ago',
-        group: 'Security',
-      },
-      {
-        id: 'server-01',
-        name: 'Server-01',
-        subtitle: 'Application Server',
-        ip: '192.168.1.10',
-        type: 'Server',
-        os: 'Ubuntu 22.04 LTS',
-        status: 'Online',
-        lastSeen: 'Just now',
-        group: 'Servers',
-      },
-      {
-        id: 'ap-01',
-        name: 'AP-01',
-        subtitle: 'Access Point',
-        ip: '192.168.1.20',
-        type: 'Access Point',
-        os: 'Ubiquiti UniFi OS 3.2',
-        status: 'Online',
-        lastSeen: '3 mins ago',
-        group: 'Wireless',
-      },
-      {
-        id: 'pc-admin',
-        name: 'PC-Admin',
-        subtitle: 'Admin Workstation',
-        ip: '192.168.1.50',
-        type: 'PC',
-        os: 'Windows 10 Pro',
-        status: 'Online',
-        lastSeen: '1 min ago',
-        group: 'Workstations',
-      },
-      {
-        id: 'server-backup',
-        name: 'Server-Backup',
-        subtitle: 'Backup Server',
-        ip: '192.168.1.60',
-        type: 'Server',
-        os: 'Windows Server 2019',
-        status: 'Online',
-        lastSeen: '4 mins ago',
-        group: 'Servers',
-      },
-      {
-        id: 'camera-01',
-        name: 'Camera-01',
-        subtitle: 'IP Camera',
-        ip: '192.168.1.70',
-        type: 'IP Camera',
-        os: 'Dahua 4.2.1',
-        status: 'Unreachable',
-        lastSeen: '1 hour ago',
-        group: 'Surveillance',
-      },
-    ],
-    [],
-  )
+  const agentsQuery = useQuery({
+    queryKey: ['agents-monitoring'],
+    queryFn: () =>
+      fetchAgents({
+        page: 1,
+        limit: 200,
+        sortBy: 'updatedAt',
+        sortOrder: 'desc',
+      }),
+  })
+
+  const allRows: DeviceRow[] = useMemo(() => {
+    const agents = agentsQuery.data?.data ?? []
+    return agents.map((agent) => {
+      const lastSeenAt = new Date(agent.lastSeenAt)
+      const minutesSinceSeen = (Date.now() - lastSeenAt.getTime()) / 60_000
+      const status: DeviceStatus = minutesSinceSeen > 2 ? 'Offline' : 'Online'
+      const lastSeen =
+        minutesSinceSeen < 1
+          ? 'Just now'
+          : `${Math.floor(minutesSinceSeen)} min${Math.floor(minutesSinceSeen) > 1 ? 's' : ''} ago`
+
+      return {
+        id: String(agent.id),
+        name: agent.name || agent.identifier,
+        subtitle: agent.identifier,
+        ip: agent.licenseKey.code,
+        type: 'Agent App',
+        os: `${agent.platform ?? 'unknown'} ${agent.arch ?? ''}`.trim(),
+        status,
+        lastSeen,
+        group: 'Agent Apps',
+      }
+    })
+  }, [agentsQuery.data])
 
   const counts = useMemo(() => {
-    const total = 128
-    const online = 98
-    const offline = 30
-    const unreachable = 12
-    const groups = 8
+    const total = agentsQuery.data?.meta.total ?? allRows.length
+    const online = allRows.filter((row) => row.status === 'Online').length
+    const offline = allRows.filter((row) => row.status === 'Offline').length
+    const unreachable = allRows.filter((row) => row.status === 'Unreachable').length
+    const groups = 1
     return { total, online, offline, unreachable, groups }
-  }, [])
+  }, [agentsQuery.data, allRows])
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase()
